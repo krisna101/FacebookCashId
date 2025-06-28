@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacebookCash - Nonton Reels Dapat Uang</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex; /* Menggunakan flexbox untuk phone-frame di tengah */
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh; /* Tinggi minimal agar phone-frame di tengah vertikal */
+        }
+
+        .phone-frame {
+            width: 346px; /* Lebar umum untuk tampilan HP */
+            height: 650px; /* Tinggi umum untuk tampilan HP */
+            border: 8px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            display: none; /* Ini yang menyembunyikan status bar */
+        }
+
+        .header {
+            background-color: #3b5998;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Untuk logo dan ikon kanan */
+            color: #fff;
+            position: relative; /* Untuk tombol kembali */
+            z-index: 2; /* Ensure header is above content */
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header .icons {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Styling for the message icon and its badge */
+        .header .icon-with-badge {
+            position: relative;
+            margin-left: 15px; /* Adjust spacing */
+            cursor: pointer;
+        }
+
+        .header .icon-with-badge i {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px; /* Adjust vertical position */
+            right: -5px; /* Adjust horizontal position */
+            background-color: #f00; /* Red color */
+            color: #fff;
+            border-radius: 50%;
+            width: 10px; /* Small dot size */
+            height: 10px; /* Small dot size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8px; /* For a count if needed, but we'll just use a dot */
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+
+        .header .back-btn {
+            font-size: 20px;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+            display: none; /* Default hidden, shown by JS on mission page */
+            cursor: pointer;
+        }
+
+        .header .title-text {
+            font-size: 20px;
+            font-weight: bold;
+            flex-grow: 1; /* Agar judul berada di tengah jika back-btn muncul */
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+        
+        /* New Top Navbar for Balance */
+        .top-balance-navbar {
+            background-color: #f8f8f8; /* Lighter background for distinction */
+            color: #333;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            z-index: 1; /* Ensure it's above content but below header */
+        }
+        .top-balance-navbar .balance-info {
+            font-weight: bold;
+        }
+        .top-balance-navbar .balance-amount {
+            color: #4CAF50; /* Green for money */
+            margin-left: 5px; /* Space between Saldo: and amount */
+        }
+        .top-balance-navbar .withdraw-btn {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .top-balance-navbar .withdraw-btn:active {
+            opacity: 0.8;
+        }
+
+
+        /* Konten Utama (Beranda & Misi) */
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f0f2f5;
+            padding: 0; /* Remove padding from content-area itself */
+            position: relative; /* For absolute positioning of notification view */
+        }
+        
+        /* Padding for specific content */
+        .home-content, .mission-content, #saldoContent .empty-reels-message, #eventContent .empty-reels-message, #premiumContent .premium-page-section, #withdrawalFormContent, #reelsPageContent .empty-reels-message, #reelsPageContent .reels-recommendation-section { 
+            padding: 15px;
+        }
+
+        .home-content {
+            /* display: block; */ /* Default active */
+        }
+
+        .mission-content {
+            display: none; /* Hidden by default */
+        }
+
+        /* Styles for Mission Cards - remains the same */
+        .mission-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Animasi menghilang */
+        }
+
+        .mission-card.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            height: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            overflow: hidden;
+        }
+
+        .mission-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .mission-header .fb-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .mission-header .mission-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .mission-details p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .mission-details .reward {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        .mission-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .mission-actions .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 5px;
+            cursor: pointer;
+            box-sizing: border-box; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .mission-actions .btn-primary {
+            background-color: #3b5998;
+            color: #fff;
+            border: none;
+        }
+
+        .upload-button-wrapper {
+            position: relative; 
+            flex-grow: 1;
+            margin: 0 5px;
+            display: flex; 
+        }
+
+        .custom-upload-btn {
+            background-color: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+            flex-grow: 1; 
+            cursor: pointer;
+            box-sizing: border-box;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        .custom-upload-btn:active, .mission-actions .btn:active {
+            opacity: 0.8;
+        }
+
+        .upload-input-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            padding: 10px 0;
+            width: 100%;
+            flex-shrink: 0; 
+            z-index: 2; /* Ensure bottom nav is above content */
+        }
+
+        .bottom-nav a {
+            text-decoration: none;
+            color: #555;
+            font-size: 12px;
+            text-align: center;
+            flex-grow: 1; 
+            padding: 5px 0; 
+        }
+        
+        .bottom-nav a.active {
+            color: #3b5998;
+        }
+
+        .bottom-nav a i {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 20px;
+        }
+
+        /* Samsung Style Notification (Temporary Toast) */
+        .samsung-notification {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .samsung-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .samsung-notification .icon {
+            font-size: 20px;
+            color: #4CAF50; /* Green checkmark */
+        }
+
+        /* Notification View (New Full-Page Overlay) */
+        .notification-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f2f5;
+            z-index: 3; /* Above all other content except the header */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+        }
+
+        .notification-view .header-notification {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .notification-view .header-notification .back-btn-notification {
+            font-size: 20px;
+            color: #fff;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .notification-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .notification-item {
+            background-color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start; /* Align items to the top for better text flow */
+            gap: 10px;
+        }
+
+        .notification-item .notif-icon {
+            font-size: 20px;
+            color: #3b5998; /* Default icon color */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+
+        .notification-item.reward .notif-icon {
+            color: #4CAF50; /* Green for reward */
+        }
+        .notification-item.info .notif-icon {
+            color: #ff9800; /* Orange for info */
+        }
+        .notification-item.warning .notif-icon {
+            color: #f44336; /* Red for warning */
+        }
+
+        .notification-item .notif-content {
+            flex-grow: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        .notification-item .notif-time {
+            font-size: 11px;
+            color: #999;
+            white-space: nowrap;
+            flex-shrink: 0; /* Prevent time from shrinking */
+        }
+
+        /* --- Home Content Styles (UPDATED) --- */
+        .home-section-title {
+            font-size: 17px; /* Sedikit lebih kecil dari 18px */
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            padding: 0 15px; 
+        }
+        
+        /* Perkecil ukuran font untuk paragraf dan elemen teks umum di dalam home-content */
+        .home-content p,
+        .home-content .news-item .news-summary,
+        .home-content .video-recommendation-input p,
+        .home-content .small-note,
+        .home-content .leaderboard-item .name,
+        .home-content .leaderboard-item .score {
+            font-size: 13px; /* Ukuran font yang sedikit lebih kecil */
+        }
+
+        /* Video Recommendation Input Section */
+        .video-recommendation-input {
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .video-recommendation-input input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .video-recommendation-input button {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .video-recommendation-input button:active {
+            opacity: 0.8;
+        }
+
+        /* Reels Recommendation Section (Now in Reels Page) */
+        .reels-recommendation-section {
+            padding: 0; /* Padding handled by parent #reelsPageContent */
+            background-color: #fff; /* Still give it a background if needed */
+            margin-bottom: 15px; /* Margin to separate from other sections */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            /* Removed max-height and overflow-y: auto for full display */
+        }
+
+        /* For the specific reels cards list, keep padding and internal spacing */
+        #reelsPageContent .reels-recommendation-section .reels-card {
+            padding: 15px; /* Add padding to individual cards if they don't have it */
+            margin-bottom: 0; /* Remove extra margin if border already there */
+            border-bottom: 1px solid #eee; /* Keep separator */
+        }
+        #reelsPageContent .reels-recommendation-section .reels-card:last-child {
+            border-bottom: none;
+        }
+
+
+        .reels-card {
+            display: flex;
+            align-items: center;
+            /* margin-bottom: 10px; */ /* Removed/adjusted as per new padding */
+            /* padding-bottom: 10px; */ /* Removed/adjusted as per new padding */
+            /* border-bottom: 1px solid #eee; */ /* Moved to #reelsPageContent .reels-recommendation-section .reels-card */
+        }
+        .reels-card:last-child {
+            /* border-bottom: none; */
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .reels-thumbnail {
+            width: 80px;
+            height: 80px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+            font-size: 12px;
+            position: relative; 
+        }
+        .reels-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .reels-thumbnail .play-icon {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .reels-info {
+            flex-grow: 1;
+        }
+        .reels-info .reels-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .reels-info .reels-meta {
+            font-size: 12px;
+            color: #777;
+        }
+        .reels-info .reels-meta i {
+            margin-right: 3px;
+        }
+
+        /* Adjusted btn-watch for rectangular button (UPDATED) */
+        .reels-card .btn-watch {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 8px 12px; /* Sesuaikan padding agar lebih kotak */
+            width: auto; /* Hapus width tetap agar menyesuaikan konten */
+            height: auto; /* Hapus height tetap */
+            border-radius: 5px; /* Kembali ke border-radius standar/kotak */
+            font-size: 14px; /* Sesuaikan ukuran font */
+            text-decoration: none;
+            margin-left: 10px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* Hapus atau abaikan gaya untuk ikon di dalam tombol jika Anda menghapus ikonnya dari HTML */
+        /* .reels-card .btn-watch i { margin: 0; } */
+
+
+        .news-announcement-section {
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .news-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .news-item .news-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .news-item .news-date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        /* --- Leaderboard Preview Styles --- */
+        .leaderboard-preview-section {
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .leaderboard-item .rank {
+            font-weight: bold;
+            color: #3b5998;
+            width: 25px; 
+            text-align: center;
+        }
+
+        /* --- Withdrawal Form Styles --- */
+        .withdrawal-form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 15px; 
+        }
+        /* Penting: Pastikan ini tetap display: none; sebagai default */
+        #withdrawalFormContent {
+            display: none; 
+        }
+
+        .withdrawal-form-container h3 {
+            font-size: 18px;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: calc(100% - 20px); 
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box; 
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group select:focus {
+            border-color: #3b5998;
+            outline: none;
+        }
+
+        .submit-withdrawal-btn {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .submit-withdrawal-btn:active {
+            opacity: 0.8;
+        }
+
+        .withdrawal-message {
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        /* --- Premium Upgrade Content for allMissionsCompleted & Premium Page --- */
+        .premium-page-section { 
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        #allMissionsCompleted.empty-reels-message { 
+            padding: 20px;
+            margin-top: 15px;
+        }
+        #premiumContent .premium-page-section { 
+            padding: 15px;
+        }
+
+
+        .premium-page-section h2 {
+            color: #3b5998;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .premium-page-section h2 i {
+            margin-right: 8px;
+            color: gold; 
+        }
+
+        .premium-page-section .premium-benefits-list,
+        .premium-page-section .other-benefits-list { 
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            text-align: left;
+        }
+        .premium-page-section .premium-benefits-list li,
+        .premium-page-section .other-benefits-list li { 
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .premium-page-section .premium-benefits-list li i,
+        .premium-page-section .other-benefits-list li i { 
+            color: #4CAF50; 
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .premium-page-section .premium-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f44336; 
+            margin-bottom: 20px;
+        }
+
+        .premium-page-section .upgrade-now-btn { 
+            background-color: #28a745; 
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 80%;
+            max-width: 200px;
+            transition: background-color 0.3s ease;
+        }
+        .premium-page-section .upgrade-now-btn:active {
+            opacity: 0.8;
+        }
+
+        .premium-page-section .small-note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 15px;
+        }
+        .premium-page-section p { 
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .premium-page-section .section-title-small { 
+            font-size: 16px;
+            font-weight: bold;
+            color: #3b5998;
+            margin-top: 25px; 
+            margin-bottom: 10px;
+        }
+
+        /* --- Custom CSS for floating Reels button (UPDATED) --- */
+        .bottom-nav .nav-reels-btn {
+            background-color: #3b5998; /* Warna latar belakang */
+            color: #fff; /* Warna ikon dan teks */
+            border-radius: 50%; /* Membuat tombol menjadi bulat */
+            width: 30px; /* Ukuran lebar tombol diperkecil */
+            height: 50px; /* Ukuran tinggi tombol diperkecil */
+            display: flex;
+            flex-direction: column; /* Untuk menata ikon dan teks secara vertikal */
+            justify-content: center;
+            align-items: center;
+            font-size: 10px; /* Ukuran font lebih kecil untuk teks di bawah ikon */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Efek mengambang sedikit lebih kecil */
+            transform: translateY(-15px); /* Menggeser tombol ke atas agar terlihat mengambang (disesuaikan) */
+            transition: all 0.3s ease; /* Transisi halus untuk efek hover/active */
+            flex-shrink: 0; /* Pastikan tidak menyusut */
+            position: relative; /* Diperlukan untuk z-index */
+            z-index: 10; /* Pastikan tombol berada di atas elemen lain di navbar */
+            border: 3px solid #f0f2f5; /* Border untuk efek terpisah dari background nav (disesuaikan) */
+        }
+
+        .bottom-nav .nav-reels-btn i {
+            font-size: 24px; /* Ukuran ikon lebih besar (disesuaikan) */
+            margin-bottom: 2px; /* Jarak antara ikon dan teks (disesuaikan) */
+        }
+
+        .bottom-nav .nav-reels-btn.active {
+            background-color: #2e4a86; /* Warna sedikit lebih gelap saat aktif */
+            color: #fff;
+        }
+
+        /* Menyesuaikan item navigasi lainnya agar tetap sejajar */
+        .bottom-nav a {
+            padding: 5px 0; /* Kurangi padding default jika perlu */
+            margin: 0 3px; /* Tambahkan sedikit margin agar tidak terlalu rapat (disesuaikan) */
+        }
+
+        /* Sesuaikan lebar nav items agar tombol reels punya ruang */
+        .bottom-nav .nav-item:not(.nav-reels-btn) {
+            flex-grow: 1; /* Biarkan item lain tumbuh untuk mengisi ruang */
+        }
+
+        /* Styles for Event Kejar Untung Section */
+        .event-kejar-untung-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 15px; /* Tambahkan margin agar tidak terlalu mepet dengan header */
+        }
+
+        .event-kejar-untung-section h2 {
+            color: #3b5998;
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event-kejar-untung-section h2 i {
+            margin-right: 8px;
+        }
+
+        .event-kejar-untung-section p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .progress-bar-container {
+            width: 90%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 15px;
+            margin: 15px auto 10px auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%; /* Initial width */
+            background-color: #4CAF50; /* Green progress */
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .share-to-fb-btn {
+            background-color: #4267B2; /* Facebook blue */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            display: inline-flex; /* Agar ikon dan teks sejajar */
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .share-to-fb-btn:active {
+            opacity: 0.9;
+        }
+
+        .share-to-fb-btn i {
+            font-size: 18px;
+        }
+
+        .bonus-status {
+            margin-top: 10px;
+            padding: 8px 10px;
+            background-color: #e8f5e9; /* Light green background */
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        /* Styles for Share Invite Box */
+        .share-invite-box {
+            background-color: #e6f7ff; /* Light blue background */
+            border: 1px solid #91d5ff; /* Light blue border */
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 20px auto 15px auto; /* Menyesuaikan margin */
+            text-align: left;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .share-invite-box .invite-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            word-break: break-all; /* Memastikan link tidak keluar batas */
+        }
+        
+        .share-invite-box .invite-text span {
+            font-weight: bold;
+            color: #3b5998;
+        }
+
+        .copy-link-btn {
+            background-color: #6c757d; /* Grey button */
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-link-btn:active {
+            opacity: 0.9;
+        }
+
+        /* Styles for Share Guidance */
+        .share-guidance {
+            background-color: #f9f9f9;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .share-guidance .guidance-title {
+            font-size: 15px;
+            color: #3b5998;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-guidance ol {
+            padding-left: 20px; /* Indentasi daftar */
+            margin: 0;
+        }
+
+        .share-guidance li {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .share-guidance li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Payment Popup Overlays */
+        .payment-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Above everything else */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .payment-popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .payment-popup-content {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .payment-popup-overlay.show .payment-popup-content {
+            transform: translateY(0);
+        }
+
+        .payment-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .payment-popup-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-popup-btn {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+        .close-popup-btn:hover {
+            color: #333;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-option-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .payment-option-card:hover {
+            background-color: #f0f2f5;
+            border-color: #3b5998;
+        }
+
+        .payment-option-card img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 4px; /* Slight roundness for logos */
+        }
+
+        .payment-option-card span {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Payment Details Common Styles */
+        .payment-details p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .payment-details p strong {
+            color: #333;
+        }
+
+        .bank-info-box {
+            background-color: #f8f8f8;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .bank-info-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .copy-account-btn {
+            background-color: #007bff; /* Blue for copy */
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .copy-account-btn:active {
+            opacity: 0.9;
+        }
+
+        .qris-qr-code-container {
+            margin: 20px auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block; /* Agar bisa rata tengah */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .qris-qr-code-container img {
+            width: 180px; /* Ukuran QRIS */
+            height: 180px;
+            display: block;
+        }
+
+        .payment-confirmed-btn {
+            background-color: #28a745; /* Green for confirmation */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+        .payment-confirmed-btn:active {
+            opacity: 0.9;
+        }
+
+        /* Styles for Active Users Info within Home Content */
+        .active-users-info-home {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Pusatkan secara horizontal di dalam div */
+            color: #555; /* Warna teks yang lebih kalem untuk konten */
+            font-size: 14px;
+            margin-bottom: 20px; /* Jarak dengan elemen di bawahnya */
+        }
+
+        .active-users-info-home .active-users-icon {
+            font-size: 18px; /* Ukuran ikon sedikit lebih besar */
+            margin-right: 8px; /* Jarak antara ikon dan teks */
+            color: #4CAF50; /* Warna hijau untuk ikon aktif */
+        }
+
+        /* Header logo dan title default. JavaScript akan mengatur display mereka */
+        .header .logo { display: block; } /* Default visible */
+        .header .title-text { display: none; } /* Default hidden */
+        .header .back-btn { display: none; } /* Default hidden */
+
+        /* Aturan untuk ketika back-btn muncul (diaktifkan oleh JS) */
+        .header.show-back-btn .logo { display: none; }
+        .header.show-back-btn .title-text { display: block; }
+        .header.show-back-btn .back-btn { display: block; } /* Back button visible */
+
+        /* Ikon di header (pesan) selalu terlihat, search dihapus */
+        .header .icons { display: flex; align-items: center; }
+
+        /* Styles for Registration Popup (reusing .payment-popup-overlay and .payment-popup-content) */
+        .registration-form .form-group {
+            margin-bottom: 15px;
+            text-align: left; /* Agar label dan input rata kiri dalam popup */
+        }
+
+        .registration-form label {
+            display: block;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .registration-form input[type="text"],
+        .registration-form input[type="tel"], /* Added for phone number */
+        .registration-form input[type="password"] { /* Added for password */
+            width: calc(100% - 20px); /* Adjust width for padding */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .registration-form input[type="text"]:focus,
+        .registration-form input[type="tel"]:focus, /* Added for phone number */
+        .registration-form input[type="password"]:focus { /* Added for password */
+            border-color: #3b5998;
+            outline: none;
+        }
+
+        .registration-form .btn-primary {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* --- User Testimonials Section Styles --- */
+        .user-testimonials-section {
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .testimonial-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .testimonial-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .testimonial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .testimonial-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .testimonial-rating {
+            color: #FFD700; /* Warna emas untuk bintang */
+            font-size: 13px;
+        }
+
+        .testimonial-text {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .testimonial-date {
+            font-size: 11px;
+            color: #999;
+            text-align: right;
+            display: block; /* Agar bisa rata kanan */
+        }
+
+        /* Styles to hide the close button and prevent overlay click for registration popup */
+        .payment-popup-overlay.no-close .close-popup-btn {
+            display: none;
+        }
+
+        /* Optional: Prevent clicking outside from closing the popup */
+        .payment-popup-overlay.no-close {
+            pointer-events: all; /* Ensure it receives clicks */
+        }
+
+        .payment-popup-overlay.no-close .payment-popup-content {
+            pointer-events: auto; /* Ensure content inside is clickable */
+        }
+
+        /* Override previous overlay click listener for no-close state */
+        .payment-popup-overlay.no-close:not(.payment-popup-content) {
+            cursor: default; /* Change cursor to default to indicate it's not clickable */
+        }
+
+        /* NEW CSS for CS Icon */
+        .header .icon-cs {
+            position: relative;
+            margin-right: 15px; /* Sesuaikan jarak antara ikon CS dan ikon pesan */
+            cursor: pointer;
+        }
+
+        .header .icon-cs i {
+            font-size: 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar">
+            </div>
+        <div class="header">
+            <a href="#" class="back-btn" id="backButton"><i class="fas fa-arrow-left"></i></a>
+            <div class="logo" id="headerLogo">FacebookCash</div>
+            <div class="title-text" id="headerTitle"></div>
+            <div class="icons" id="headerIcons">
+                <div class="icon-cs" id="csIconContainer">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="icon-with-badge" id="messageIconContainer">
+                    <i class="fas fa-comment-dots" id="messageIcon"></i>
+                    <span class="notification-badge" id="messageBadge"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-balance-navbar" id="topBalanceNavbar">
+            <div class="balance-info">
+                <span>Saldo:</span>
+                <span class="balance-amount" id="currentBalanceTopNav">Rp 25.000</span>
+            </div>
+            <button class="withdraw-btn" id="withdrawButton">Tarik</button>
+        </div>
+
+        <div class="content-area">
+            <div id="homeContent" class="home-content">
+                <div class="active-users-info-home" id="activeUsersInfoHome">
+                    <i class="fas fa-user-friends active-users-icon"></i> <span id="activeUsersCountHome">67.168</span>    &nbsp;sedang aktif
+                </div>
+                <img src="fb.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                <h3 class="home-section-title" style="margin-top: 25px;">Rekomendasikan Video Anda</h3>
+                <div class="video-recommendation-input">
+                    <p>Ingin video Facebook Anda direkomendasikan di halaman kami? Masukkan linknya di sini!</p>
+                    <input type="text" id="videoLinkInput" placeholder="Masukkan link video Facebook Anda...">
+                    <button id="submitVideoRecommendation">Rekomendasikan</button>
+                    <p class="small-note" style="margin-top: 10px; color: #f44336;">*Fitur ini tersedia untuk pengguna Premium.</p>
+                </div>
+                
+                <h3 class="home-section-title">Papan Peringkat Teratas</h3>
+                <div class="leaderboard-preview-section">
+                    <div class="leaderboard-item">
+                        <span class="rank">#1</span>
+                        <span class="name">Hari Joss</span>
+                        <span class="score">Rp 5.125.000</span>
+                    </div>
+                    <div class="leaderboard-item">
+                        <span class="name">Marsha Lenathea</span>
+                        <span class="score">Rp 3.170.500</span>
+                    </div>
+                    <div class="leaderboard-item">
+                        <span class="rank">#3</span>
+                        <span class="name">hassan nur</span>
+                        <span class="score">Rp 2.198.750</span>
+                    </div>
+                    <div class="leaderboard-item">
+                        <span class="rank">#4</span>
+                        <span class="name">Dewi Lestari</span>
+                        <span class="score">Rp 2.120.000</span>
+                    </div>
+                    <div class="leaderboard-item">
+                        <span class="rank">#5</span>
+                        <span class="name">Agus Wijaya</span>
+                        <span class="score">Rp 1.772.300</span>
+                    </div>
+                </div>
+
+                <h3 class="home-section-title">Testimoni Pengguna</h3>
+                <div class="user-testimonials-section">
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Manda sonia</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Alhamdulillah saya udah berhasil share ke 10 grup facebook dan saya telah mendapatkan hadiah 100k&#128521;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Sri riyanti</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Awalnya ragu upgrade ke Premium,Eh ada teman yang mencoba upgrade dan benar banyak manfaat nya&#128176;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Rian Arifin</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Akun premium emang joss&#128170;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">agil febriana</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Njir ada hari joss dan bang hassan di sini&#128176;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">ilham taufik</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Sebenarnya ini web sudah lama udah dari tahun 2024 ,tapi sampai sekarang masih membayar sih"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Kayla Ftr</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Alhamdulillah setelah upgrade ke Premium terasa banget banyak manfaatnya"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Meyra nur Fazriani</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Akhirnya setelah aku menyelesaikan misi pada event kejar untung,saya mendapatkan 100k dan bisa langsung di tarik ke dana&#128521;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">mayang</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"banyak juga pengguna Facebook pro disini,dan ada suhunya juga&#128176;"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Rudi Hartono</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Fitur premium emang the best,bisa promosikan reels kita di sini,gara gara aplikasi ini 8 hari Facebook saya udah di monet"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">yana mulyana</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"kemarin saya promosikan vidio reels saya di sini,viewernya banyak banget,dan yang gift star juga lumayan ada"</p>
+                        <span class="testimonial-date">28 Juni 2025</span>
+                    </div>
+                    
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Sri Handayani</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"lebih enak akun premium sih, penarikan cepat,dan ada 10 misi nonton reels dan setiap nonton hadiahnya gede banget"</p>
+                        <span class="testimonial-date">27 Juni 2025</span>
+                    </div>
+                    <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Budi Santoso</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Aplikasi ini luar biasa! Saya tidak menyangka bisa dapat uang hanya dengan nonton Reels. Penarikan lancar!"</p>
+                        <span class="testimonial-date">26 Juni 2025</span>
+                    </div>
+                    <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Siti Aminah</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Sangat direkomendasikan! Misi-misinya mudah dan hadiahnya lumayan buat nambah uang jajan. Eventnya juga seru!"</p>
+                        <span class="testimonial-date">25 Juni 2025</span>
+                    </div>
+                    <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Rudi Hartono</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"Awalnya ragu, tapi setelah coba ternyata benar-benar membayar. Fitur Premiumnya juga sangat worth it!"</p>
+                        <span class="testimonial-date">24 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Alya Nur Fadilah</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">FacebookCash emang mantap,baru daftar udah bisa narik uang&#128176;"</p>
+                        <span class="testimonial-date">27 Juni 2025</span>
+                    </div>
+                                        <div class="testimonial-item">
+                        <div class="testimonial-header">
+                            <span class="testimonial-name">Bunda kayla</span>
+                            <span class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                        </div>
+                        <p class="testimonial-text">"mantap nih,narik uang Rp 50.000 tidak lama langsung masuk ke rekening saya"</p>
+                        <span class="testimonial-date">24 Juni 2025</span>
+                    </div>
+                </div>
+
+                <div class="empty-reels-message" id="homeMissionsEmptyPlaceholder" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Selamat datang di FacebookCash!</p>
+                    <p>Kerjakan misi untuk mendapatkan saldo.</p>
+                </div>
+            </div>
+
+            <div id="missionContent" class="mission-content">
+                 <img src="misifb.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                <div class="mission-card" data-mission-id="mission1" data-reward="8000">
+                    <div class="mission-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/100px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook Icon" class="fb-icon">
+                        <div class="mission-name">Misi 1: Like Reels Facebook</div>
+                    </div>
+                    <div class="mission-details">
+                        <p><strong>Panduan Tugas:</strong></p>
+                        <p>1. Klik kerjakan.</p>
+                        <p>2. Like vidio Reels</p>
+                        <p>3. Pastikan Anda menonton setiap Reels hingga selesai.</p>
+                        <p>4. Setelah selesai menonton Dan like,silahkan **screenshot**.</p>
+                        <p>5. Klik upload screenshot </p>
+                    </div>
+                    <div class="reward">Hadiah: Rp 8.000</div>
+                    <div class="mission-actions">
+                        <a href="https://www.facebook.com/reels/" target="_blank" class="btn btn-primary">Kerjakan</a>
+                        <div class="upload-button-wrapper">
+                            <span class="custom-upload-btn" data-input-target="uploadInput1">Upload Screenshot</span>
+                            <input type="file" accept="image/*" class="upload-input-hidden" id="uploadInput1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-card" data-mission-id="mission2" data-reward="8000">
+                    <div class="mission-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/100px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook Icon" class="fb-icon">
+                         <div class="mission-name">Misi 2: Like Reels Facebook</div>
+  </div>
+  <div class="mission-details">
+      <p><strong>Panduan Tugas:</strong></p>
+      <p>1. Klik kerjakan.</p>
+      <p>2. Like vidio Reels</p>
+      <p>3. Pastikan Anda menonton setiap Reels hingga selesai.</p>
+      <p>4. Setelah selesai menonton Dan like,silahkan **screenshot**.</p>
+      <p>5. Klik upload screenshot </p>
+  </div>
+  <div class="reward">Hadiah: Rp 8.000</div>
+  <div class="mission-actions">
+      <a href="https://www.facebook.com/reels/" target="_blank" class="btn btn-primary">Kerjakan</a>
+      <div class="upload-button-wrapper">
+          <span class="custom-upload-btn" data-input-target="uploadInput2">Upload Screenshot</span>
+          <input type="file" accept="image/*" class="upload-input-hidden" id="uploadInput2">
+      </div>
+  </div>
+                </div>
+
+                <div class="mission-card" data-mission-id="mission3" data-reward="8000">
+                    <div class="mission-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/100px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook Icon" class="fb-icon">
+                          <div class="mission-name">Misi 3: Like Reels Facebook</div>
+  </div>
+  <div class="mission-details">
+      <p><strong>Panduan Tugas:</strong></p>
+      <p>1. Klik kerjakan.</p>
+      <p>2. Like vidio Reels</p>
+      <p>3. Pastikan Anda menonton setiap Reels hingga selesai.</p>
+      <p>4. Setelah selesai menonton Dan like,silahkan **screenshot**.</p>
+      <p>5. Klik upload screenshot </p>
+  </div>
+  <div class="reward">Hadiah: Rp 8.000</div>
+  <div class="mission-actions">
+      <a href="https://www.facebook.com/reels/" target="_blank" class="btn btn-primary">Kerjakan</a>
+      <div class="upload-button-wrapper">
+          <span class="custom-upload-btn" data-input-target="uploadInput3">Upload Screenshot</span>
+          <input type="file" accept="image/*" class="upload-input-hidden" id="uploadInput3">
+      </div>
+  </div>
+                </div>
+
+                <div class="mission-card" data-mission-id="mission4" data-reward="8000">
+                    <div class="mission-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/100px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook Icon" class="fb-icon">
+                        <div class="mission-name">Misi 4: Silahkan Follow pengguna baru</div>
+                    </div>
+                    <div class="mission-details">
+                        <p><strong>Panduan Tugas:</strong></p>
+                        <p>1. Klik kerjakan.</p>
+                        <p>2. Follow akun.</p>
+                        <p>3. Jangan lupa **Screenshot**dan upload screenshot untuk mengklaim hadiah.</p>
+                    </div>
+                    <div class="reward">Hadiah: Rp 8.000</div>
+                    <div class="mission-actions">
+                        <a href="https://www.facebook.com/deli.resti.oktavia" target="_blank" class="btn btn-primary">Kerjakan</a>
+                        <div class="upload-button-wrapper">
+                            <span class="custom-upload-btn" data-input-target="uploadInput4">Upload Screenshot</span>
+                            <input type="file" accept="image/*" class="upload-input-hidden" id="uploadInput4">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-card" data-mission-id="mission5" data-reward="8000">
+                    <div class="mission-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/100px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook Icon" class="fb-icon">
+                       <div class="mission-name">Misi 5: Silahkan Follow pengguna baru</div>
+</div>
+<div class="mission-details">
+    <p><strong>Panduan Tugas:</strong></p>
+    <p>1. Klik kerjakan.</p>
+    <p>2. Follow akun.</p>
+    <p>3. Jangan lupa **Screenshot**dan upload screenshot untuk mengklaim hadiah.</p>
+</div>
+<div class="reward">Hadiah: Rp 8.000</div>
+<div class="mission-actions">
+    <a href="https://www.facebook.com/profile.php?id=100076698752006" target="_blank" class="btn btn-primary">Kerjakan</a>
+    <div class="upload-button-wrapper">
+        <span class="custom-upload-btn" data-input-target="uploadInput5">Upload Screenshot</span>
+        <input type="file" accept="image/*" class="upload-input-hidden" id="uploadInput5">
+    </div>
+</div>
+                </div>
+                
+                <div class="empty-reels-message" id="allMissionsCompleted" style="display: none;">
+                    </div>
+            </div>
+            
+            <div id="saldoContent" class="mission-content">
+                <div class="empty-reels-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Informasi saldo detail akan muncul di sini.</p>
+                </div>
+            </div>
+
+            <div id="eventContent" class="mission-content">
+                <div class="event-kejar-untung-section premium-page-section">
+                    <h2><i class="fas fa-trophy" style="color: gold;"></i> Event Kejar Untung!</h2>
+                     <img src="eventfb.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                    <p>Dapatkan bonus ekstra Rp 100.000 dengan membagikan aplikasi ini ke grup Facebook!</p>
+                    
+                    <div class="share-invite-box">
+                        <p class="invite-text">
+                            Ayo Gabung FacebookCash! Nonton Reels Dapat Saldo! Buktikan sendiri di: <span id="inviteLinkText"></span>
+                        </p>
+                        <button class="btn btn-secondary copy-link-btn" id="copyInviteLinkButton">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="eventProgressBar" style="width: 0%;"></div>
+                    </div>
+                    <p class="progress-text" id="eventProgressText">0/10 grup dibagikan</p>
+                    <button class="btn btn-primary share-to-fb-btn" id="shareToFacebookButton">
+                        <i class="fab fa-facebook"></i> Bagikan ke Grup Facebook
+                    </button>
+                    
+                    <div class="share-guidance">
+                        <h4 class="guidance-title"><i class="fas fa-info-circle"></i> Panduan Cara Share:</h4>
+                        <ol>
+                            <li>Klik salin text dan Klik tombol "Bagikan ke Grup Facebook".</li>
+                            <li>Anda akan diarahkan ke Facebook. Cari dan pilih 1 grup publik.</li>
+                            <li>Tempelkan (paste) link ajakan yang sudah disalin tadi.</li>
+                            <li>Tulis caption menarik (misal: "Aplikasi ini beneran bayar!").</li>
+                            <li>Bagikan postingan. Ulangi sampai 10 grup!</li>
+                            <li>Setelah share, kembali ke aplikasi FacebookCash untuk update progres.</li>
+                        </ol>
+                    </div>
+
+                    <p class="small-note" style="margin-top: 15px;">
+                        * Pastikan Anda membagikan ke grup publik dan sertakan teks ajakan menarik!
+                    </p>
+                    <p class="bonus-status" id="bonusStatusMessage" style="display: none; color: #28a745; font-weight: bold;">
+                        Selamat! Bonus Rp 100.000 telah ditambahkan ke saldo Anda!
+                    </p>
+                </div>
+            </div>
+
+            <div id="premiumContent" class="mission-content">
+                </div>
+
+            <div id="withdrawalFormContent" class="withdrawal-form-container">
+                 <img src="wdfb.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                <p style="font-size: 13px; color: #555; text-align: center; margin-bottom: 15px;">
+                    Saldo Anda saat ini: <strong id="formCurrentBalance">Rp 0</strong>
+                </p>
+
+                <div class="form-group">
+                    <label for="withdrawalAmount">Jumlah Penarikan (Min. Rp 50.000):</label>
+                    <input type="number" id="withdrawalAmount" placeholder="Contoh: 50000" min="50000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="bankName">Nama Bank:</label>
+                    <select id="bankName">
+                        <option value="">Pilih Bank</option>
+                        <option value="BCA">BCA</option>
+                        <option value="BRI">BRI</option>
+                        <option value="BNI">BNI</option>
+                        <option value="Mandiri">Mandiri</option>
+                        <option value="CIMB Niaga">CIMB Niaga</option>
+                        <option value="DANA">DANA (E-Wallet)</option>
+                        <option value="Gopay">Gopay (E-Wallet)</option>
+                        <option value="OVO">OVO (E-Wallet)</option>
+                        </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountNumber">Nomor Rekening / E-Wallet:</label>
+                    <input type="text" id="accountNumber" placeholder="Masukkan nomor rekening atau nomor HP terdaftar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountHolderName">Nama Pemilik Rekening:</label>
+                    <input type="text" id="accountHolderName" placeholder="Sesuai dengan nama di buku tabungan/akun E-Wallet">
+                </div>
+
+                <button class="submit-withdrawal-btn" id="submitWithdrawalButton">Kirim Permintaan Penarikan</button>
+                <p class="withdrawal-message" id="withdrawalStatusMessage">Pastikan semua data terisi dengan benar. Proses penarikan dapat memakan waktu 1x24 jam.</p>
+            </div>
+
+            <div id="reelsPageContent" class="mission-content">
+                <h3 class="home-section-title" style="padding-left: 0; padding-right: 0;">Reels Rekomendasi</h3> 
+                <img src="reels.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                <div class="reels-recommendation-section">
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">Tutorial Fyp Facebook pro</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 1.2M Tayangan | oleh Hari Joss</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1204677935026882/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">jogetin aja</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 850K Tayangan | oleh Hari Joss</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1244703867024729/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">#Fyp #jangkauanluas</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 500K Tayangan | Hari Joss</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1797100974560584/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb1.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">Family pulsa</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 320K Tayangan | oleh hassan sule</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1395592304978998/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb1.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">belum siap tapi paket sudah datang</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 780K Tayangan | oleh hassan sule</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1420414782331497/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb1.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">Godain mantan</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 410K Tayangan | oleh Hassan Sule</div>
+                        </div>
+                        <a href="https://www.facebook.com/reel/1759569781631073/?mibextid=rS40aB7S9Ucbxw6v" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb2.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">langsung diamkan?</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 620K Tayangan | Zulkifli</div>
+                        </div>
+                        <a href="https://www.facebook.com/share/r/1DzYXDJnXf/" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb2.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">wah si baju merah selalu menyala</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 950K Tayangan | Zulkifli</div>
+                        </div>
+                        <a href="https://www.facebook.com/share/r/19gBMRVgLc/" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb2.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">Hanya ibu</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 700K Tayangan | oleh Zulkifli</div>
+                        </div>
+                        <a href="https://www.facebook.com/share/r/1J4KCXh1a8/" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                    <div class="reels-card">
+                        <div class="reels-thumbnail">
+                            <img src="tb2.jpg" alt="Reels Thumbnail">
+                            <i class="fas fa-play play-icon"></i>
+                        </div>
+                        <div class="reels-info">
+                            <div class="reels-title">Zinah mata itu nyata</div>
+                            <div class="reels-meta"><i class="fas fa-eye"></i> 1.1M Tayangan | oleh Zulkifli</div>
+                        </div>
+                        <a href="https://www.facebook.com/share/r/1B7uAGiJ71/" target="_blank" class="btn-watch">Tonton</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="notificationView" class="notification-view">
+                <div class="header-notification">
+                    <a href="#" class="back-btn-notification" id="backButtonNotification"><i class="fas fa-arrow-left"></i></a>
+                    <span>Notifikasi</span>
+                </div>
+                <div class="notification-list" id="notificationList">
+                    <div class="empty-reels-message" style="margin-top: 15px;">
+                        <i class="fas fa-bell"></i>
+                        <p>Belum ada notifikasi.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="homeContent"><i class="fas fa-home"></i> Beranda</a>
+            <a href="#" class="nav-item" data-target="missionContent"><i class="fas fa-clipboard-list"></i> Misi</a> 
+            <a href="#" class="nav-item nav-reels-btn" data-target="reelsPageContent"><i class="fas fa-video"></i> Reels</a> 
+            <a href="#" class="nav-item" data-target="premiumContent"><i class="fas fa-star"></i> Premium</a> 
+            <a href="#" class="nav-item" data-target="eventContent"><i class="fas fa-calendar-alt"></i> Event</a>
+        </div>
+
+        <div class="samsung-notification" id="toastNotification"> 
+            <div class="icon"><i class="fas fa-check-circle"></i></div>
+            <div class="message"></div>
+        </div>
+
+    <div id="paymentMethodPopup" class="payment-popup-overlay">
+        <div class="payment-popup-content">
+            <div class="payment-popup-header">
+                <h3>Pilih Metode Pembayaran</h3>
+                <span class="close-popup-btn" id="closePaymentPopup">&times;</span>
+            </div>
+            <div class="payment-options">
+                <div class="payment-option-card" data-method="bri">
+                    <img src="bri.png" alt="Logo BRI">
+                    <span>Transfer Bank BRI</span>
+                </div>
+                <div class="payment-option-card" data-method="qris">
+                    <img src="qris.png" alt="Logo QRIS">
+                    <span>QRIS (Semua Bank/E-Wallet)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="briPaymentDetailsPopup" class="payment-popup-overlay">
+        <div class="payment-popup-content">
+            <div class="payment-popup-header">
+                <h3>Pembayaran via BRI</h3>
+                <span class="close-popup-btn" id="closeBriPaymentPopup">&times;</span>
+            </div>
+            <div class="payment-details">
+                <p>Silakan transfer sejumlah **Rp 100.000** ke rekening berikut:</p>
+                <div class="bank-info-box">
+                    <p>Bank: <strong>BRI</strong></p>
+                    <p>Nomor Rekening: <strong id="briAccountNumber">4288 0100 8559 504</strong></p>
+                    <p>Atas Nama: <strong>Kxxxxx Rxxxxx Pxxxx</strong></p>
+                </div>
+                <button class="btn btn-secondary copy-account-btn" id="copyBriAccount">
+                    <i class="fas fa-copy"></i> Salin Nomor Rekening
+                </button>
+                <p class="small-note" style="margin-top: 15px;">
+                    * Mohon transfer sesuai nominal agar transaksi terverifikasi otomatis.
+                    Setelah transfer, saldo Premium akan aktif dalam 5-10 menit.
+                </p>
+                <button class="btn btn-primary payment-confirmed-btn" id="confirmBriPayment">
+                    Saya Sudah Transfer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrisPaymentDetailsPopup" class="payment-popup-overlay">
+        <div class="payment-popup-content">
+            <div class="payment-popup-header">
+                <h3>Pembayaran via QRIS</h3>
+                <span class="close-popup-btn" id="closeQrisPaymentPopup">&times;</span>
+            </div>
+            <div class="payment-details qris-details">
+                <p>Silakan scan QR Code di bawah ini untuk pembayaran sejumlah **Rp 100.000**:</p>
+                <div class="qris-qr-code-container">
+                    <img src="qr.jpg" alt="QRIS Code" id="qrisImage">
+                </div>
+                <p class="small-note" style="margin-top: 15px;">
+                    * Scan QRIS ini menggunakan aplikasi pembayaran Anda (Dana, OVO, Gopay, Mobile Banking, dll.).
+                    Pastikan nominal yang ditransfer sesuai. Saldo Premium akan aktif dalam 5-10 menit.
+                </p>
+                <button class="btn btn-primary payment-confirmed-btn" id="confirmQrisPayment">
+                    Saya Sudah Scan & Bayar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="registrationPopup" class="payment-popup-overlay">
+        <div class="payment-popup-content">
+            <div class="payment-popup-header">
+                <h3>Daftar FacebookCash</h3>
+                <span class="close-popup-btn" id="closeRegistrationPopup">&times;</span>
+            </div>
+            <div class="registration-form">
+                <p>Daftar sekarang untuk mulai menghasilkan uang!</p>
+                <div class="form-group">
+                    <label for="regUsername">Nama Pengguna:</label>
+                    <input type="text" id="regUsername" placeholder="Masukkan nama pengguna Anda">
+                </div>
+                <div class="form-group">
+                    <label for="regPhoneNumber">No. Handphone:</label>
+                    <input type="tel" id="regPhoneNumber" placeholder="Contoh: 081234567890">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Kata Sandi:</label>
+                    <input type="password" id="regPassword" placeholder="Buat kata sandi Anda">
+                </div>
+                <button class="btn btn-primary" id="registerButton">Daftar Sekarang</button>
+                <p class="small-note" style="margin-top: 15px;">
+                    Dengan mendaftar, Anda menyetujui <a href="#" style="color:#3b5998;">Syarat & Ketentuan</a> kami.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Element References ---
+        const homeContent = document.getElementById('homeContent');
+        const missionContent = document.getElementById('missionContent');
+        const saldoContent = document.getElementById('saldoContent'); 
+        const eventContent = document.getElementById('eventContent'); 
+        const premiumContent = document.getElementById('premiumContent'); 
+        const withdrawalFormContent = document.getElementById('withdrawalFormContent'); 
+        const reelsPageContent = document.getElementById('reelsPageContent'); 
+        const notificationView = document.getElementById('notificationView'); 
+        
+        const backButton = document.getElementById('backButton');
+        const backButtonNotification = document.getElementById('backButtonNotification'); 
+        const headerLogo = document.getElementById('headerLogo');
+        const headerTitle = document.getElementById('headerTitle');
+        const headerIcons = document.getElementById('headerIcons');
+        const messageIconContainer = document.getElementById('messageIconContainer'); 
+        const messageIcon = document.getElementById('messageIcon'); 
+        const messageBadge = document.getElementById('messageBadge'); 
+        const topBalanceNavbar = document.getElementById('topBalanceNavbar'); 
+        const currentBalanceTopNav = document.getElementById('currentBalanceTopNav');
+        const withdrawButton = document.getElementById('withdrawButton'); 
+        const navItems = document.querySelectorAll('.nav-item');
+        const toastNotification = document.getElementById('toastNotification'); 
+        const toastNotificationMessage = toastNotification.querySelector('.message'); 
+        const allMissionsCompletedMessage = document.getElementById('allMissionsCompleted'); 
+        const homeMissionsEmptyPlaceholder = document.getElementById('homeMissionsEmptyPlaceholder'); 
+        const notificationList = document.getElementById('notificationList'); 
+
+        // Withdrawal form elements
+        const formCurrentBalance = document.getElementById('formCurrentBalance');
+        const withdrawalAmountInput = document.getElementById('withdrawalAmount');
+        const bankNameSelect = document.getElementById('bankName');
+        const accountNumberInput = document.getElementById('accountNumber');
+        const accountHolderNameInput = document.getElementById('accountHolderName');
+        const submitWithdrawalButton = document.getElementById('submitWithdrawalButton');
+        const withdrawalStatusMessage = document.getElementById('withdrawalStatusMessage');
+
+        // Video recommendation elements
+        const videoLinkInput = document.getElementById('videoLinkInput'); 
+        const submitVideoRecommendationButton = document.getElementById('submitVideoRecommendation'); 
+
+        // Event Kejar Untung elements
+        const eventProgressBar = document.getElementById('eventProgressBar');
+        const eventProgressText = document.getElementById('eventProgressText');
+        const shareToFacebookButton = document.getElementById('shareToFacebookButton');
+        const bonusStatusMessage = document.getElementById('bonusStatusMessage');
+
+        // Share Invite elements
+        const inviteLinkText = document.getElementById('inviteLinkText');
+        const copyInviteLinkButton = document.getElementById('copyInviteLinkButton');
+        const shareInviteBox = document.querySelector('.share-invite-box'); 
+
+        // Payment popup elements
+        const paymentMethodPopup = document.getElementById('paymentMethodPopup');
+        const closePaymentPopup = document.getElementById('closePaymentPopup');
+        const paymentOptionCards = document.querySelectorAll('.payment-option-card');
+
+        const briPaymentDetailsPopup = document.getElementById('briPaymentDetailsPopup');
+        const closeBriPaymentPopup = document.getElementById('closeBriPaymentPopup');
+        const briAccountNumber = document.getElementById('briAccountNumber');
+        const copyBriAccountButton = document.getElementById('copyBriAccount');
+        const confirmBriPaymentButton = document.getElementById('confirmBriPayment');
+
+        const qrisPaymentDetailsPopup = document.getElementById('qrisPaymentDetailsPopup');
+        const closeQrisPaymentPopup = document.getElementById('closeQrisPaymentPopup');
+        const qrisImage = document.getElementById('qrisImage');
+        const confirmQrisPaymentButton = document.getElementById('confirmQrisPayment');
+
+        // Registration popup elements
+        const registrationPopup = document.getElementById('registrationPopup');
+        const closeRegistrationPopup = document.getElementById('closeRegistrationPopup'); // Keep this reference
+        const regUsernameInput = document.getElementById('regUsername');
+        const regPhoneNumberInput = document.getElementById('regPhoneNumber'); 
+        const regPasswordInput = document.getElementById('regPassword');     
+        const registerButton = document.getElementById('registerButton');
+
+        // Upgrade button references (assigned dynamically)
+        let upgradeNowButtonPremiumPage;
+        let upgradeNowButtonDynamicMission;
+
+        // Active users elements (in homeContent)
+        const activeUsersCountHome = document.getElementById('activeUsersCountHome');
+        const activeUsersInfoHome = document.getElementById('activeUsersInfoHome');
+        const headerElement = document.querySelector('.header'); 
+
+        // Reels Watch Buttons
+        const watchReelsButtons = document.querySelectorAll('#reelsPageContent .reels-card .btn-watch'); 
+
+        // **NEW CS Icon Reference**
+        const csIconContainer = document.getElementById('csIconContainer'); //
+
+        // --- Global State Variables (from localStorage) ---
+        let currentBalance = parseInt(localStorage.getItem('facebookCashBalance')) || 5000; // Saldo awal diubah menjadi Rp 5.000
+        let completedMissions = JSON.parse(localStorage.getItem('completedMissions')) || {}; 
+        let notifications = JSON.parse(localStorage.getItem('notifications')) || []; 
+        let isPremium = JSON.parse(localStorage.getItem('isPremium')) || false; 
+        let sharedCount = parseInt(localStorage.getItem('eventSharedCount')) || 0;
+        let eventCompleted = JSON.parse(localStorage.getItem('eventCompleted')) || false;
+        let userAccount = JSON.parse(localStorage.getItem('facebookCashUser')) || null; 
+        let watchedReelsStatus = JSON.parse(localStorage.getItem('watchedReelsStatus')) || {}; 
+
+
+        // --- Constants ---
+        const MIN_WITHDRAWAL = 50000; 
+        const targetShares = 10;
+        const eventBonus = 100000;
+        const appActualUrl = 'https://tinyurl.com/FacebookCashApp-7891789'; // GANTI DENGAN URL ASLI APLIKASI ANDA!
+        const adminWhatsAppNumber = '6282265381633'; // GANTI DENGAN NOMOR WHATSAPP ADMIN ANDA! (tanpa tanda +, spasi, atau strip)
+        const reelsReward = 1000; // Hadiah untuk menonton Reels
+        const reelsWatchTime = 5000; // Waktu tonton dalam milidetik (25 detik)
+
+
+        // --- Utility Functions ---
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        function showToastNotification(message) {
+            toastNotificationMessage.textContent = message;
+            toastNotification.classList.add('show');
+            setTimeout(() => {
+                toastNotification.classList.remove('show');
+            }, 3000); 
+        }
+
+        function addNotification(type, message) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            
+            const notification = {
+                type: type, 
+                message: message,
+                timestamp: now.toISOString(),
+                displayTime: `${timeString} ${dateString}`,
+                isRead: false 
+            };
+            notifications.unshift(notification); 
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            renderNotifications(); 
+            updateMessageBadge(); 
+        }
+
+        function renderNotifications() {
+            notificationList.innerHTML = ''; 
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="empty-reels-message" style="margin-top: 15px;">
+                        <i class="fas fa-bell"></i>
+                        <p>Belum ada notifikasi.</p>
+                    </div>
+                `;
+            } else {
+                notifications.forEach((notif, index) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('notification-item', notif.type);
+                    if (!notif.isRead) {
+                        itemDiv.style.backgroundColor = '#e8f0fe'; 
+                        itemDiv.style.fontWeight = 'bold';
+                    }
+                    let iconClass = 'fas fa-info-circle'; 
+                    if (notif.type === 'reward') {
+                        iconClass = 'fas fa-dollar-sign';
+                    } else if (notif.type === 'warning') {
+                        iconClass = 'fas fa-exclamation-triangle';
+                    }
+                    itemDiv.innerHTML = `
+                        <div class="notif-icon"><i class="${iconClass}"></i></div>
+                        <div class="notif-content">${notif.message}</div>
+                        <div class="notif-time">${notif.displayTime}</div>
+                    `;
+                    itemDiv.addEventListener('click', () => {
+                        if (!notifications[index].isRead) {
+                            notifications[index].isRead = true;
+                            localStorage.setItem('notifications', JSON.stringify(notifications));
+                            renderNotifications(); 
+                            updateMessageBadge(); 
+                        }
+                    });
+                    notificationList.appendChild(itemDiv);
+                });
+            }
+        }
+
+        function updateMessageBadge() {
+            const unreadCount = notifications.filter(notif => !notif.isRead).length;
+            if (unreadCount > 0) {
+                messageBadge.style.display = 'flex'; 
+            } else {
+                messageBadge.style.display = 'none'; 
+            }
+        }
+
+        function generateAccountId() {
+            return 'FC' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        // --- Core UI Logic Functions ---
+
+        // Function to control which content is visible
+        function showContent(contentId) {
+            // Sembunyikan semua elemen konten terlebih dahulu
+            homeContent.style.display = 'none';
+            missionContent.style.display = 'none';
+            saldoContent.style.display = 'none'; 
+            eventContent.style.display = 'none'; 
+            premiumContent.style.display = 'none'; 
+            withdrawalFormContent.style.display = 'none'; 
+            reelsPageContent.style.display = 'none'; 
+            notificationView.style.display = 'none'; 
+            topBalanceNavbar.style.display = 'none'; 
+            
+            // Pastikan popup pembayaran tertutup saat berpindah halaman
+            closeAllPaymentPopups(); 
+            // Pastikan popup pendaftaran tertutup juga, kecuali jika belum terdaftar
+            if (localStorage.getItem('hasRegistered') === 'true') {
+                registrationPopup.classList.remove('show');
+            }
+
+
+            // Kemudian tampilkan elemen yang sesuai
+            document.getElementById(contentId).style.display = 'block';
+
+            // Atur tampilan header berdasarkan halaman
+            if (contentId === 'homeContent') {
+                topBalanceNavbar.style.display = 'flex';
+                backButton.style.display = 'none';
+                headerLogo.style.display = 'block';
+                headerIcons.style.display = 'flex';
+                headerTitle.style.display = 'none';
+                if (activeUsersInfoHome) activeUsersInfoHome.style.display = 'flex'; 
+                headerElement.classList.remove('show-back-btn'); 
+            } else if (contentId === 'notificationView') { 
+                notificationView.style.display = 'flex'; 
+                topBalanceNavbar.style.display = 'none'; 
+                headerLogo.style.display = 'none';
+                headerIcons.style.display = 'none'; 
+                backButton.style.display = 'none'; 
+                headerTitle.style.display = 'block'; 
+                headerTitle.textContent = 'Notifikasi';
+                if (activeUsersInfoHome) activeUsersInfoHome.style.display = 'none'; 
+                headerElement.classList.add('show-back-btn'); 
+            } else { 
+                topBalanceNavbar.style.display = 'none'; 
+                backButton.style.display = 'block';
+                headerLogo.style.display = 'none';
+                headerIcons.style.display = 'none'; 
+                headerTitle.style.display = 'block';
+                if (activeUsersInfoHome) activeUsersInfoHome.style.display = 'none'; 
+                headerElement.classList.add('show-back-btn'); 
+
+                if (contentId === 'missionContent') {
+                    headerTitle.textContent = 'Daftar Misi';
+                } else if (contentId === 'saldoContent') {
+                    headerTitle.textContent = 'Detail Saldo';
+                } else if (contentId === 'eventContent') {
+                    headerTitle.textContent = 'Event & Promo';
+                    updateEventProgress(); 
+                } else if (contentId === 'premiumContent') { 
+                    headerTitle.textContent = 'Akun Premium';
+                    updatePremiumContentPage(); 
+                } else if (contentId === 'withdrawalFormContent') { 
+                    headerTitle.textContent = 'Formulir Penarikan';
+                    updateBalanceDisplay(); 
+                } else if (contentId === 'reelsPageContent') { 
+                    headerTitle.textContent = 'Facebook Reels';
+                    updateReelsButtonStatus(); // Panggil ini saat halaman Reels ditampilkan
+                }
+            }
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeNavItem = document.querySelector(`.nav-item[data-target="${contentId}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+        }
+
+        function updateBalanceDisplay() {
+            currentBalanceTopNav.textContent = formatRupiah(currentBalance); 
+            formCurrentBalance.textContent = formatRupiah(currentBalance); 
+            localStorage.setItem('facebookCashBalance', currentBalance); 
+        }
+
+        function checkAllMissionsCompleted() {
+            const allMissionCards = document.querySelectorAll('.mission-card');
+            let remainingMissionsCount = 0;
+
+            allMissionCards.forEach(card => {
+                const missionId = card.dataset.missionId;
+                if (!completedMissions[missionId]) {
+                    card.classList.remove('hidden'); 
+                    card.style.display = 'block'; 
+                    remainingMissionsCount++;
+                } else {
+                    card.classList.add('hidden'); 
+                    card.style.display = 'none'; 
+                }
+            });
+
+            const homeMissionsPlaceholder = document.getElementById('homeMissionsEmptyPlaceholder');
+
+            if (remainingMissionsCount === 0) {
+                allMissionsCompletedMessage.style.display = 'block'; 
+                
+                if (!isPremium) {
+                    allMissionsCompletedMessage.innerHTML = `
+                        <div class="premium-page-section"> 
+                            <h2><i class="fas fa-crown"></i> Tingkatkan ke Premium!</h2>
+                            <p>Selesaikan lebih banyak misi dan dapatkan hadiah lebih besar dengan akun Premium!</p>
+                            <div class="premium-benefits-list">
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Misi Harian: <strong>10 Misi</strong></li>
+                                    <li><i class="fas fa-check-circle"></i> Hadiah per Misi: <strong>Rp 9.000</strong></li>
+                                    <li><i class="fas fa-check-circle"></i> Penarikan Tanpa Batas</li>
+                                </ul>
+                            </div>
+                            <h3 class="section-title-small">Manfaat Lainnya</h3>
+                            <div class="other-benefits-list">
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Membuka Fungsi Penarikan</li>
+                                    <li><i class="fas fa-check-circle"></i> Konten Facebook Anda Direkomendasikan oleh Kami di halaman beranda "REELS REKOMENDASI"</li>
+                                </ul>
+                            </div>
+                            <div class="premium-price">
+                                Harga Upgrade: Rp 100.000
+                            </div>
+                            <button class="upgrade-now-btn" id="upgradeNowButtonDynamicMission">Upgrade Sekarang</button>
+                            <p class="small-note">Pembayaran akan diproses melalui metode yang tersedia.</p>
+                        </div>
+                    `;
+                } else {
+                    allMissionsCompletedMessage.innerHTML = `
+                        <div class="premium-page-section"> 
+                            <i class="fas fa-trophy" style="font-size: 50px; color: gold; margin-bottom: 15px;"></i>
+                            <p>Selamat! Anda telah menyelesaikan semua misi yang tersedia saat ini.</p>
+                            <p>Sebagai pengguna Premium, misi baru akan segera tersedia dengan hadiah lebih besar!</p>
+                            <p style="font-size: 12px; color: #888;">Nantikan pembaruan misi Anda!</p>
+                        </div>
+                    `;
+                    homeMissionsPlaceholder.querySelector('p:first-of-type').textContent = 'Semua misi telah selesai!';
+                    homeMissionsPlaceholder.querySelector('p:last-of-type').textContent = 'Sebagai pengguna Premium, misi baru akan segera tersedia.';
+                    homeMissionsPlaceholder.querySelector('i').className = 'fas fa-trophy';
+                    homeMissionsPlaceholder.style.display = 'block';
+                }
+
+            } else {
+                allMissionsCompletedMessage.style.display = 'none'; 
+                homeMissionsPlaceholder.style.display = 'none'; 
+            }
+            assignUpgradeButtonListener(); 
+        }
+
+        function upgradeNowHandler() {
+            if (isPremium) {
+                showToastNotification('Anda sudah menjadi pengguna Premium!');
+                addNotification('info', 'Anda sudah memiliki akun Premium.');
+                return;
+            }
+            openPaymentMethodPopup(); 
+        }
+
+        function assignUpgradeButtonListener() {
+            if (upgradeNowButtonPremiumPage) {
+                upgradeNowButtonPremiumPage.removeEventListener('click', upgradeNowHandler);
+            }
+            if (upgradeNowButtonDynamicMission) {
+                upgradeNowButtonDynamicMission.removeEventListener('click', upgradeNowHandler);
+            }
+
+            upgradeNowButtonPremiumPage = document.getElementById('upgradeNowButtonPremiumPage');
+            upgradeNowButtonDynamicMission = document.getElementById('upgradeNowButtonDynamicMission');
+
+            if (upgradeNowButtonPremiumPage) {
+                upgradeNowButtonPremiumPage.addEventListener('click', upgradeNowHandler);
+            }
+            if (upgradeNowButtonDynamicMission) {
+                upgradeNowButtonDynamicMission.addEventListener('click', upgradeNowHandler);
+            }
+        }
+
+        function updatePremiumContentPage() {
+            if (!isPremium) {
+                premiumContent.innerHTML = `
+                    <div class="premium-page-section">
+                        <h2><i class="fas fa-crown"></i> Tingkatkan ke Premium!</h2>
+                         <img src="up.png" alt="Like Video TikTok Dapatkan Uang" style="max-width:100%; height:auto; margin-bottom: 25px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto;">
+                        <p>Dapatkan akses penuh ke semua manfaat dan fitur eksklusif!</p>
+                        <div class="premium-benefits-list">
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> Misi Harian: <strong>10 Misi</strong></li>
+                                <li><i class="fas fa-check-circle"></i> Hadiah per Misi: <strong>Rp 9.000</strong></li>
+                                <li><i class="fas fa-check-circle"></i> Penarikan Tanpa Batas</li>
+                                </ul>
+                            </div>
+                            <h3 class="section-title-small">Manfaat Lainnya</h3>
+                            <div class="other-benefits-list">
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Membuka Fungsi Penarikan</li>
+                                    <li><i class="fas fa-check-circle"></i> Konten Facebook Anda Direkomendasikan oleh Kami di halaman beranda "REELS REKOMENDASI"</li>
+                                </ul>
+                            </div>
+                            <div class="premium-price">
+                                Harga Upgrade: Rp 100.000
+                            </div>
+                            <button class="upgrade-now-btn" id="upgradeNowButtonPremiumPage">Upgrade Sekarang</button>
+                            <p class="small-note">Pembayaran akan diproses melalui metode yang tersedia.</p>
+                        </div>
+                    `;
+                } else {
+                    premiumContent.innerHTML = `
+                        <div class="premium-page-section">
+                            <i class="fas fa-star" style="font-size: 50px; color: gold; margin-bottom: 15px;"></i>
+                            <p><strong>Selamat! Anda adalah pengguna Premium.</strong></p>
+                            <p>Nikmati akses ke misi eksklusif, hadiah lebih besar, dan fitur premium lainnya!</p>
+                            <p style="font-size: 12px; color: #888; margin-top: 15px;">Status Premium Anda aktif.</p>
+                        </div>
+                    `;
+                }
+                assignUpgradeButtonListener(); 
+            }
+
+            function updateEventProgress() {
+                const progressPercentage = (sharedCount / targetShares) * 100;
+                eventProgressBar.style.width = `${progressPercentage}%`;
+                eventProgressText.textContent = `${sharedCount}/${targetShares} grup dibagikan`;
+
+                if (sharedCount >= targetShares && !eventCompleted) {
+                    currentBalance += eventBonus;
+                    updateBalanceDisplay();
+                    eventCompleted = true;
+                    localStorage.setItem('eventCompleted', JSON.stringify(eventCompleted));
+                    localStorage.setItem('facebookCashBalance', currentBalance); 
+                    bonusStatusMessage.style.display = 'block'; 
+                    showToastNotification(`Selamat! Anda mendapatkan bonus Event Kejar Untung sebesar ${formatRupiah(eventBonus)}!`);
+                    addNotification('reward', `Selamat! Bonus Event Kejar Untung ${formatRupiah(eventBonus)} telah ditambahkan.`);
+                    shareToFacebookButton.disabled = true; 
+                    shareToFacebookButton.innerHTML = 'Event Selesai'; 
+                    shareToFacebookButton.style.backgroundColor = '#cccccc'; 
+                } else if (eventCompleted) {
+                    shareToFacebookButton.disabled = true;
+                    shareToFacebookButton.innerHTML = 'Event Selesai';
+                    shareToFacebookButton.style.backgroundColor = '#cccccc';
+                    bonusStatusMessage.style.display = 'block'; 
+                } else {
+                    shareToFacebookButton.disabled = false;
+                    shareToFacebookButton.innerHTML = '<i class="fab fa-facebook"></i> Bagikan ke Grup Facebook'; 
+                    shareToFacebookButton.style.backgroundColor = '#4267B2';
+                    bonusStatusMessage.style.display = 'none'; 
+                }
+            }
+
+            function updateActiveUsers() {
+                const randomCount = Math.floor(Math.random() * (100000 - 50000 + 1)) + 50000;
+                if (activeUsersCountHome) { 
+                    activeUsersCountHome.textContent = randomCount.toLocaleString('id-ID');
+                }
+            }
+
+            // Fungsi untuk mengupdate tampilan tombol Reels (aktif/non-aktif) secara individual /**/
+            function updateReelsButtonStatus() {
+                // Memuat ulang status dari localStorage setiap kali fungsi dipanggil
+                watchedReelsStatus = JSON.parse(localStorage.getItem('watchedReelsStatus')) || {}; 
+
+                watchReelsButtons.forEach(button => {
+                    // Pastikan reelsLink unik untuk setiap video. Gunakan href sebagai kunci.
+                    const reelsLink = button.href; 
+                    if (watchedReelsStatus[reelsLink]) { 
+                        button.disabled = true;
+                        button.innerHTML = '<i class="fas fa-check"></i> Ditonton';
+                        button.style.backgroundColor = '#6c757d'; /* Warna abu-abu untuk ditonton */
+                    } else {
+                        button.disabled = false;
+                        button.innerHTML = 'Tonton'; // Kembali ke teks "Tonton"
+                        button.style.backgroundColor = '#3b5998'; /* Warna asli Play */
+                    }
+                });
+            }
+
+            // --- Event Handlers ---
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetId = this.dataset.target;
+                    showContent(targetId);
+                });
+            });
+
+            backButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                showContent('homeContent'); 
+            });
+
+            backButtonNotification.addEventListener('click', function() {
+                showContent('homeContent'); 
+            });
+
+            messageIconContainer.addEventListener('click', function() {
+                showContent('notificationView'); 
+                notifications.forEach(notif => notif.isRead = true);
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+                renderNotifications(); 
+                updateMessageBadge(); 
+            });
+
+            // **NEW CS Icon Event Listener**
+            csIconContainer.addEventListener('click', function() {
+                const chatMessage = encodeURIComponent('Halo CS, saya ingin bertanya tentang aplikasi FacebookCash.');
+                const whatsappURL = `https://wa.me/${adminWhatsAppNumber}?text=${chatMessage}`;
+                window.open(whatsappURL, '_blank');
+            });
+
+            withdrawButton.addEventListener('click', function() {
+                showContent('withdrawalFormContent'); 
+            });
+
+            submitWithdrawalButton.addEventListener('click', function() {
+                const amount = parseInt(withdrawalAmountInput.value);
+                const bank = bankNameSelect.value;
+                const accountNumber = accountNumberInput.value.trim();
+                const accountHolder = accountHolderNameInput.value.trim();
+
+                if (isNaN(amount) || amount < MIN_WITHDRAWAL || amount > currentBalance) {
+                    showToastNotification(`Jumlah penarikan tidak valid. Minimum ${formatRupiah(MIN_WITHDRAWAL)} dan tidak melebihi saldo Anda.`);
+                    withdrawalStatusMessage.textContent = `Gagal: Jumlah penarikan tidak valid. Min. ${formatRupiah(MIN_WITHDRAWAL)}, Saldo Anda: ${formatRupiah(currentBalance)}.`;
+                    withdrawalStatusMessage.style.color = 'red';
+                    addNotification('warning', `Gagal penarikan: Jumlah tidak valid (Rp ${amount || 0}).`);
+                    return;
+                }
+                if (!bank || !accountNumber || !accountHolder) {
+                    showToastNotification('Mohon lengkapi semua data penarikan.');
+                    withdrawalStatusMessage.textContent = 'Gagal: Mohon lengkapi semua data penarikan (Bank, No. Rekening, Nama Pemilik).';
+                    withdrawalStatusMessage.style.color = 'red';
+                    addNotification('warning', 'Gagal penarikan: Data tidak lengkap.');
+                    return;
+                }
+
+                // Logika penarikan berdasarkan status premium
+                if (isPremium) {
+                    // Jika akun premium, langsung berhasil
+                    currentBalance -= amount;
+                    updateBalanceDisplay();
+                    showToastNotification(`Penarikan ${formatRupiah(amount)} berhasil!`);
+                    addNotification('reward', `Penarikan ${formatRupiah(amount)} ke ${bank} (${accountNumber}) berhasil diproses.`);
+                    
+                    withdrawalStatusMessage.textContent = `Penarikan ${formatRupiah(amount)} berhasil diproses dan dikirim ke rekening Anda.`;
+                    withdrawalStatusMessage.style.color = '#4CAF50'; // Warna hijau untuk berhasil
+                    
+                    withdrawalAmountInput.value = '';
+                    bankNameSelect.value = '';
+                    accountNumberInput.value = '';
+                    accountHolderNameInput.value = '';
+
+                } else {
+                    // Jika bukan akun premium, ikuti logika penundaan dan pengembalian saldo
+                    const originalBalance = currentBalance; // Simpan saldo asli
+                    currentBalance -= amount;
+                    updateBalanceDisplay();
+                    showToastNotification(`Permintaan penarikan ${formatRupiah(amount)} berhasil diajukan. Saldo Anda sedang diproses.`);
+                    addNotification('info', `Permintaan penarikan ${formatRupiah(amount)} ke ${bank} (${accountNumber}) sedang diproses.`);
+                    
+                    withdrawalStatusMessage.textContent = `Permintaan penarikan ${formatRupiah(amount)} sedang dalam proses pengecekan...`;
+                    withdrawalStatusMessage.style.color = 'orange'; // Warna untuk status "sedang diproses"
+                    
+                    setTimeout(() => {
+                        currentBalance = originalBalance; // Kembalikan saldo ke nilai sebelum penarikan
+                        updateBalanceDisplay();
+                        
+                        showToastNotification(`Penarikan ${formatRupiah(amount)} gagal. Saldo telah dikembalikan,silahkan uprade ke premium untuk membuka fungsi penarikan.`);
+                        addNotification('warning', `Penarikan ${formatRupiah(amount)} ke ${bank} (${accountNumber}) gagal. Saldo telah dikembalikan,silahkan uprade ke premium untuk membuka fungsi penarikan.`);
+                        
+                        withdrawalStatusMessage.textContent = `Penarikan ${formatRupiah(amount)} GAGAL. Saldo Anda telah dikembalikan: ${formatRupiah(currentBalance)}.`;
+                        withdrawalStatusMessage.style.color = 'red'; // Warna merah untuk status "gagal"
+                        
+                        withdrawalAmountInput.value = '';
+                        bankNameSelect.value = '';
+                        accountNumberInput.value = '';
+                        accountHolderNameInput.value = '';
+
+                    }, 120000); // 2 menit dalam milidetik (2 * 60 * 1000)
+                }
+            });
+
+            submitVideoRecommendationButton.addEventListener('click', function() {
+                const videoLink = videoLinkInput.value.trim();
+                if (!videoLink) {
+                    showToastNotification('Mohon masukkan link video.');
+                    addNotification('warning', 'Gagal merekomendasikan video: Link kosong.');
+                    return;
+                }
+
+                if (!isPremium) {
+                    showToastNotification('Fitur rekomendasi video hanya tersedia untuk pengguna Premium.');
+                    addNotification('info', 'Untuk merekomendasikan video, silakan upgrade ke Premium.');
+                    videoLinkInput.value = ''; 
+                    return;
+                }
+
+                if (!videoLink.startsWith('https://www.facebook.com/')) {
+                    showToastNotification('Hanya link video Facebook yang didukung.');
+                    addNotification('warning', 'Link video tidak valid. Pastikan ini link Facebook.');
+                    return;
+                }
+
+                showToastNotification('Link video Anda telah diterima. Akan ditinjau untuk rekomendasi.');
+                addNotification('info', `Video link "${videoLink}" telah diajukan untuk rekomendasi.`);
+                videoLinkInput.value = ''; 
+            });
+
+            document.querySelectorAll('.custom-upload-btn').forEach(customBtn => {
+                customBtn.addEventListener('click', function() {
+                    const inputId = this.dataset.inputTarget;
+                    const hiddenInput = document.getElementById(inputId);
+                    hiddenInput.click();
+                });
+            });
+
+            document.querySelectorAll('.upload-input-hidden').forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const missionCard = this.closest('.mission-card');
+                        const missionId = missionCard.dataset.missionId;
+                        const reward = parseInt(missionCard.dataset.reward);
+
+                        if (!completedMissions[missionId]) {
+                            completedMissions[missionId] = true;
+                            localStorage.setItem('completedMissions', JSON.stringify(completedMissions));
+                            
+                            currentBalance += reward;
+                            updateBalanceDisplay(); 
+                            const message = `Misi ${missionId.replace('mission', '')} selesai! Saldo bertambah ${formatRupiah(reward)}.`;
+                            showToastNotification(message);
+                            addNotification('reward', message); 
+
+                            missionCard.classList.add('hidden');
+                            setTimeout(() => {
+                                missionCard.style.display = 'none'; 
+                                checkAllMissionsCompleted(); 
+                            }, 500); 
+                        } else {
+                            const message = 'Misi ini sudah Anda selesaikan!';
+                            showToastNotification(message);
+                            addNotification('info', message); 
+                        }
+                    }
+                });
+            });
+
+            shareToFacebookButton.addEventListener('click', function() {
+                if (eventCompleted) {
+                    showToastNotification('Event ini sudah selesai!');
+                    addNotification('info', 'Anda sudah menyelesaikan Event Kejar Untung.');
+                    return;
+                }
+
+                const facebookShareURL = 'https://www.facebook.com/groups/'; 
+                window.open(facebookShareURL, '_blank'); 
+
+                setTimeout(() => { 
+                    if (sharedCount < targetShares) { 
+                        sharedCount++;
+                        localStorage.setItem('eventSharedCount', sharedCount);
+                        updateEventProgress();
+                        if (sharedCount < targetShares) {
+                            showToastNotification(`Berhasil dibagikan! Sisa ${targetShares - sharedCount} lagi.`);
+                            addNotification('info', `Anda telah membagikan ke ${sharedCount} grup Facebook.`);
+                        } else {
+                            showToastNotification(`Event Kejar Untung Selesai! Bonus Rp 100.000 sedang diproses!`);
+                            addNotification('reward', `Event Kejar Untung selesai. Bonus Rp 100.000 akan ditambahkan.`);
+                        }
+                    }
+                }, 1000); 
+            });
+            
+            inviteLinkText.textContent = appActualUrl; 
+
+            copyInviteLinkButton.addEventListener('click', function() {
+                const textToCopy = shareInviteBox.innerText; 
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToastNotification('Teks ajakan dan link berhasil disalin!');
+                    addNotification('info', 'Teks ajakan dan link berhasil disalin ke clipboard.');
+                }).catch(err => {
+                    console.error('Gagal menyalin link:', err);
+                    showToastNotification('Gagal menyalin. Silakan salin manual.');
+                    addNotification('warning', 'Gagal menyalin teks ajakan.');
+                });
+            });
+
+            // Payment popup functions and listeners
+            function openPaymentMethodPopup() {
+                paymentMethodPopup.classList.add('show');
+            }
+
+            function closeAllPaymentPopups() {
+                paymentMethodPopup.classList.remove('show');
+                briPaymentDetailsPopup.classList.remove('show');
+                qrisPaymentDetailsPopup.classList.remove('show');
+            }
+
+            closePaymentPopup.addEventListener('click', closeAllPaymentPopups);
+            closeBriPaymentPopup.addEventListener('click', closeAllPaymentPopups);
+            closeQrisPaymentPopup.addEventListener('click', closeAllPaymentPopups);
+
+            // Removed direct overlay click closing for registration, but keep for other popups if needed
+            paymentMethodPopup.addEventListener('click', (e) => {
+                if (e.target === paymentMethodPopup) {
+                    closeAllPaymentPopups();
+                }
+            });
+            briPaymentDetailsPopup.addEventListener('click', (e) => {
+                if (e.target === briPaymentDetailsPopup) {
+                    closeAllPaymentPopups();
+                }
+            });
+            qrisPaymentDetailsPopup.addEventListener('click', (e) => {
+                if (e.target === qrisPaymentDetailsPopup) {
+                    closeAllPaymentPopups();
+                }
+            });
+
+            paymentOptionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const method = this.dataset.method;
+                    closeAllPaymentPopups(); 
+                    if (method === 'bri') {
+                        briPaymentDetailsPopup.classList.add('show');
+                    } else if (method === 'qris') {
+                        qrisPaymentDetailsPopup.classList.add('show');
+                    }
+                });
+            });
+
+            copyBriAccountButton.addEventListener('click', function() {
+                const accountNumber = briAccountNumber.textContent;
+                navigator.clipboard.writeText(accountNumber).then(() => {
+                    showToastNotification('Nomor rekening BRI berhasil disalin!');
+                    addNotification('info', 'Nomor rekening BRI berhasil disalin.');
+                }).catch(err => {
+                    console.error('Gagal menyalin nomor rekening:', err);
+                    showToastNotification('Gagal menyalin. Silakan salin manual.');
+                });
+            });
+
+            function handlePaymentConfirmation(paymentMethod) {
+                closeAllPaymentPopups(); 
+
+                const upgradeCost = 100000; 
+                const message = encodeURIComponent(
+                    `Halo Admin, saya sudah melakukan pembayaran upgrade Premium FacebookCash sebesar Rp ${upgradeCost.toLocaleString('id-ID')} via ${paymentMethod}. Mohon untuk segera di verifikasi dan aktifkan akun Premium saya. Terima kasih.`
+                );
+                const whatsappLink = `https://wa.me/${adminWhatsAppNumber}?text=${message}`;
+
+                window.open(whatsappLink, '_blank'); 
+
+                showToastNotification(`Mohon konfirmasi pembayaran Anda melalui WhatsApp. Akun Premium akan aktif setelah verifikasi admin.`);
+                addNotification('info', `Anda telah diarahkan ke WhatsApp untuk konfirmasi pembayaran ${paymentMethod}.`);
+            }
+
+            confirmBriPaymentButton.addEventListener('click', () => handlePaymentConfirmation('BRI'));
+            confirmQrisPaymentButton.addEventListener('click', () => handlePaymentConfirmation('QRIS'));
+
+            // Reels Watch Buttons Logic (UPDATED untuk bug fix) /**/
+            watchReelsButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+
+                    const reelsLink = this.href; // Ambil link Reels (pastikan ini UNIK per video di HTML!)
+                    
+                    // Cek apakah sudah ditonton sebelumnya (dari localStorage yang baru dimuat)
+                    if (watchedReelsStatus[reelsLink]) { 
+                        showToastNotification('Reels ini sudah Anda tonton.');
+                        window.open(reelsLink, '_blank'); 
+                        return;
+                    }
+                    
+                    // Nonaktifkan tombol yang sedang diklik dan ubah tampilannya (sementara)
+                    button.disabled = true; // Langsung nonaktifkan tombol yang diklik
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...'; 
+                    button.style.backgroundColor = '#6c757d'; 
+
+                    showToastNotification('Membuka Reels. Hadiah akan masuk setelah  menonton.');
+                    addNotification('info', 'Membuka Reels dan menunggu hadiah.');
+
+                    // Buka link Facebook segera
+                    window.open(reelsLink, '_blank'); 
+
+                    // Menunda pemberian hadiah dan pembaruan status permanen
+                    setTimeout(() => { 
+                        // Tandai Reels ini sebagai sudah ditonton di objek lokal
+                        watchedReelsStatus[reelsLink] = true;
+                        // Simpan status yang diperbarui ke localStorage
+                        localStorage.setItem('watchedReelsStatus', JSON.stringify(watchedReelsStatus));
+                        
+                        // Berikan hadiah
+                        currentBalance += reelsReward;
+                        updateBalanceDisplay(); 
+
+                        const message = `Selamat! Anda mendapatkan ${formatRupiah(reelsReward)} dari menonton Reels.`;
+                        showToastNotification(message);
+                        addNotification('reward', message);
+
+                        // Perbarui status tombol secara permanen setelah hadiah masuk
+                        // Ini akan memanggil updateReelsButtonStatus() yang membaca dari localStorage
+                        // dan memastikan hanya tombol yang ditonton yang non-aktif.
+                        updateReelsButtonStatus(); // Ini akan memperbarui tampilan hanya tombol yang ditonton
+                        
+                    }, reelsWatchTime); 
+                });
+            });
+
+            // Registration popup specific logic
+            function showRegistrationPopup() {
+                registrationPopup.classList.add('show');
+            }
+
+            registerButton.addEventListener('click', function() {
+                const username = regUsernameInput.value.trim();
+                const phoneNumber = regPhoneNumberInput.value.trim(); 
+                const password = regPasswordInput.value.trim();     
+
+                if (username === '') {
+                    showToastNotification('Nama pengguna tidak boleh kosong!');
+                    return;
+                }
+                if (phoneNumber === '') {
+                    showToastNotification('Nomor handphone tidak boleh kosong!');
+                    return;
+                }
+                if (password === '') {
+                    showToastNotification('Kata sandi tidak boleh kosong!');
+                    return;
+                }
+                if (!/^\d+$/.test(phoneNumber)) { 
+                    showToastNotification('Nomor handphone hanya boleh berisi angka!');
+                    return;
+                }
+                if (password.length < 6) { 
+                    showToastNotification('Kata sandi minimal 6 karakter!');
+                    return;
+                }
+
+                const accountId = generateAccountId();
+                userAccount = {
+                    username: username,
+                    phoneNumber: phoneNumber, 
+                    password: password,     
+                    accountId: accountId
+                };
+                localStorage.setItem('facebookCashUser', JSON.stringify(userAccount)); 
+                localStorage.setItem('hasRegistered', 'true'); 
+                
+                showToastNotification(`Selamat datang, ${username}! Akun Anda telah dibuat.`);
+                addNotification('info', `Selamat datang, ${username}! Akun Anda telah dibuat dengan ID: ${accountId}.`);
+
+                registrationPopup.classList.remove('show'); 
+                showContent('homeContent'); 
+                updateBalanceDisplay(); 
+                checkAllMissionsCompleted(); 
+                updatePremiumContentPage();
+                updateActiveUsers(); 
+            });
+
+            // REMOVE OR COMMENT OUT THIS EVENT LISTENER:
+            // closeRegistrationPopup.addEventListener('click', function() {
+            //     registrationPopup.classList.remove('show');
+            // });
+
+            // --- Initial Load Logic (DOMContentLoaded) ---
+            document.addEventListener('DOMContentLoaded', () => {
+                const hasRegistered = localStorage.getItem('hasRegistered');
+                if (!hasRegistered || !userAccount || !userAccount.username || !userAccount.phoneNumber || !userAccount.password) { 
+                    showRegistrationPopup(); 
+                    // Ensure the registration popup remains open and cannot be closed
+                    // by adding a class that hides the close button and prevents overlay click
+                    registrationPopup.classList.add('no-close');
+                } else {
+                    showContent('homeContent'); 
+                    updateBalanceDisplay();
+                    checkAllMissionsCompleted();
+                    updatePremiumContentPage();
+                    updateActiveUsers(); 
+                    updateReelsButtonStatus(); 
+                }
+
+                assignUpgradeButtonListener(); 
+                updateEventProgress(); 
+                setInterval(updateActiveUsers, 5000); 
+                renderNotifications(); 
+                updateMessageBadge(); 
+            });
+        </script>
+    </body>
+    </html>
